@@ -1,0 +1,24 @@
+---
+title: "data_clinical_sample_analysis"
+format: html
+---
+
+# Load Packages
+
+```{r}
+library(readr)
+library(here)
+library(tidyverse)
+```
+
+# Load Data
+
+```{r}
+clinical_sample <- read.delim(here("data", "data_clinical_sample.txt"), sep = "\t", skip = 4, header = TRUE)
+```
+
+```{r}
+clinical_sample |>
+  select(-c(PATIENT_ID, SAMPLE_ID))|>
+  summarise_all(unique)
+```
