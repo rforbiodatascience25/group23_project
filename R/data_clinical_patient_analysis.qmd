@@ -43,7 +43,7 @@ patients <- patients |>
   mutate( 
     Overall.Survival.Status = case_when(Overall.Survival.Status == "0:LIVING" ~ 0,
                                         Overall.Survival.Status == "1:DECEASED" ~ 1),
-    Suvival.Status.Clean = case_when(Overall.Survival.Status == 0 ~ "Living",
+    Survival.Status.Clean = case_when(Overall.Survival.Status == 0 ~ "Living",
                                         Overall.Survival.Status == 1 ~ "Deceased")
   )
 ```
@@ -52,9 +52,18 @@ More data wrangling could be done?
 
 ```{r}
 patients |> 
+  mutate(Age.Group.at.Diagnosis.in.Years = factor(
+      Age.Group.at.Diagnosis.in.Years,
+      levels = c("<30", "31-50", "50-60", "61-70", ">71"),
+      ordered = TRUE
+    ),)
+```
+
+```{r}
+patients <- patients |> 
   rename(Survival_Months = Overall.Survival..Months., 
-         OS_satus = Overall.Survival.Status,
-         Age_d0 = Age.Group.at.Diagnosis.in.Years,
+         OS_status = Overall.Survival.Status,
+         Age_group = Age.Group.at.Diagnosis.in.Years,
          Patient_ID = X.Patient.Identifier)
 ```
 
@@ -76,6 +85,16 @@ age group -\> make factors based on age group
 
 "early"
 
+Making a survival rate column, using the Kaplan-Meier survival analysis
+
+```{r}
+
+patients$Survival_Months |> 
+  sum()
+patients |> 
+  mutate(Survival_Rate = sum(Survival_Months$OS_status==0))
+```
+
 ## Plots
 
 We will be looking at the proportion of men vs women that have survived the cancer depending on their age and then depending on the type of treatment they received. (Survival proportion per treatment)
@@ -94,12 +113,18 @@ patients |>
 ```{r}
 library(ggplot2)
 library(Cairo)
+
+order = c('<30', '31-50', '50-60', '61-70', '>71')
 patients |>
-  ggplot(aes(x = Age.Group.at.Diagnosis.in.Years,
+  ggplot(aes(x = factor(Age.Group.at.Diagnosis.in.Years, levels = order),
              fill = Sex)) +
-  geom_bar(position = "dodge") +
-  facet_wrap(~ Suvival.Status.Clean)
+  geom_bar(position = "dodge")+
+  labs(title="Proportion of Cancer diagnosed in Men and Woman at different ages", 
+       x = "Age group at Diagnosis (years)")
+  #facet_wrap(~ Suvival.Status.Clean)
 ```
+
+Most cases of cancer Seem to be diagnosed in between the ages of 61 to 70, for both man and woman. In general there seems to be more cases of cancers in man.
 
 ```{r}
 patients |> 
@@ -111,12 +136,13 @@ patients |>
 ```
 
 ```{r}
-patients |> 
+patients |>
+  filter(Age.Group.at.Diagnosis.in.Years == "61-70") |> 
   ggplot(mapping = aes(x = Drug.Type,
                        y = Overall.Survival..Months.,
                        fill = Sex))+
-  geom_boxplot()+
-  facet_wrap(~Age.Group.at.Diagnosis.in.Years)
+  geom_point()+
+  facet_wrap(~ Survival.Status.Clean)
 ```
 
 How many months considered still alive?
@@ -132,10 +158,21 @@ patients |>
 library(survival)
 library(survminer)
 
+patients$Survival_Months <- as.numeric(patients$Survival_Months)
+
+fit <- survfit(Surv(Survival_Months, OS_status) ~ Age_group, data = patients)
+
+ggsurvplot(fit, data = patients, legend = "right")
+
+```
+
+```{r}
+library(survival)
+library(survminer)
+
 patients$Overall.Survival..Months. <- as.numeric(patients$Overall.Survival..Months.)
 
-fit <- survfit(Surv(Overall.Survival..Months., Overall.Survival.Status) ~ Age.Group.at.Diagnosis.in.Years, data = patients)
+fit <- survfit(Surv(Overall.Survival..Months., Overall.Survival.Status) ~ Drug.Type, data = patients)
 
 ggsurvplot(fit, data = patients)
-
 ```
