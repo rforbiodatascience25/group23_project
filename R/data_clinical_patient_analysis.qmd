@@ -8,18 +8,86 @@ editor: visual
 ## Importing libraries
 
 ```{r}
-#| echo : Fasle
+#| echo : False
 library("tidyverse")
 ```
 
 ## Importing data
 
 ```{r}
-file.exists("data/data_clinical_patient.txt")
+getwd()
+```
+
+```{r}
+file.exists("../data/data_clinical_patient.txt")
 
 ```
 
 ```{r}
-patients <- load(file = "data/data_clinical_patient.txt")
+raw_patients <- read.csv(file = "../data/data_clinical_patient.txt", sep = "\t")
+#open txt file as a csv, sepertation as tabs: "\t"
+```
 
+```{r}
+#removing the 4 first rows that "explain" the columns
+patients <- raw_patients[-c(1,2,3,4),]
+```
+
+## Data Wrangling
+
+```{r}
+#Changing the OS status to numeric + adding a column to make it clearer (in case)
+#0 for the Living patients
+#1 for the patients that died
+patients <- patients |> 
+  mutate( 
+    Overall.Survival.Status = case_when(Overall.Survival.Status == "0:LIVING" ~ 0,
+                                        Overall.Survival.Status == "1:DECEASED" ~ 1),
+    Suvival.Status.Clean = case_when(Overall.Survival.Status == 0 ~ "Living",
+                                        Overall.Survival.Status == 1 ~ "Deceased")
+  )
+```
+
+More data wrangling could be done?
+
+```{r}
+patients |> 
+  rename(Survival_Months = Overall.Survival..Months., 
+         OS_satus = Overall.Survival.Status,
+         Age_d0 = Age.Group.at.Diagnosis.in.Years,
+         Patient_ID = X.Patient.Identifier)
+```
+
+## Plots
+
+We will be looking at the proportion of men vs women that have survived the cancer depending on their age and then depending on the type of treatment they received. (Survival proportion per treatment)
+
+bins = age group?
+
+facet =
+
+```{r}
+patients |> 
+  ggplot(mapping = aes(x = Age.Group.at.Diagnosis.in.Years, 
+                       fill =  Sex)) +
+  geom_histogram()
+```
+
+```{r}
+library(ggplot2)
+library(Cairo)
+patients |>
+  ggplot(aes(x = Age.Group.at.Diagnosis.in.Years,
+             fill = Sex)) +
+  geom_bar(position = "dodge") +
+  facet_wrap(~ Overall.Survival.Status)
+```
+
+```{r}
+patients |> 
+  filter(Age.Group.at.Diagnosis.in.Years == "61-70") |> 
+  ggplot(mapping = aes(x = Drug.Type,
+                       fill = Sex))+
+  geom_bar(position = "dodge")+
+  facet_wrap(~ Overall.Survival..Months.)
 ```
