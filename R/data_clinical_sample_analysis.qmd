@@ -22,3 +22,13 @@ clinical_sample |>
   select(-c(PATIENT_ID, SAMPLE_ID))|>
   summarise_all(unique)
 ```
+
+```{r}
+clinical_sample %>% select(CANCER_TYPE) %>% unique()
+clinical_sample %>% select(SAMPLE_TYPE) %>% unique()
+clinical_sample %>% select(SAMPLE_CLASS) %>% unique()
+clinical_sample %>% select(METASTATIC_SITE) %>% unique()
+clinical_sample %>% select(PRIMARY_SITE) %>% unique()
+clinical_sample %>% select(GENE_PANEL) %>% unique()
+
+```
