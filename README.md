@@ -24,19 +24,11 @@ Detailed information for each column with examples can be found in the descripti
 ## TODOs:
 
 -   Survival Rate (with different parameters, ex tumor types, drug types, tmb, kind of mutation)(Romane)
-
-<!-- -->
-
--   Linear Mixed Models(correlation of survival rate with all the different information)(Cora)
-
+-   Logistic regression(correlation of survival rate with all the different information)(Cora)
+-   Correlation Matrix(Cora)
 -   Partial Correlation(survival rates to all the paramters)(Louis)
-
 -   Number of metastasis compared to tumor type(Cora)
-
 -   corellation of TMB to metastasis, mutation(), cancer type(Francesc, Maxence)
-
 -   comparison number of mutations and IMPACT version(Francesc)
-
 -   Kind of mutation to TMB, Metastasis(Maxence)
-
 -   Kind of Mutations numbers(Maxence)
