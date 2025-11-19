@@ -3,7 +3,7 @@ title: "logistic_regression"
 format: html
 ---
 
-# Load Packages
+# [Load Packages](https://www.r-bloggers.com/2015/09/how-to-perform-a-logistic-regression-in-r/)
 
 ```{r}
 library(readr)
@@ -11,7 +11,7 @@ library(here)
 library(tidyverse)
 ```
 
-# Load Data
+# [Load Data](https://www.r-bloggers.com/2015/09/how-to-perform-a-logistic-regression-in-r/)
 
 ```{r}
 clinical_sample <- read.delim(here("data", "data_clinical_sample.txt"), sep = "\t", skip = 4, header = TRUE)
@@ -21,7 +21,7 @@ mutations <- read.delim(here("data", "data_mutations.txt"), sep = "\t", header =
 clinical_patient <- read.delim(here("data", "data_clinical_patient.txt"), sep = "\t", skip = 4, header = TRUE)
 ```
 
-# Clean Data
+# [Clean Data](https://www.r-bloggers.com/2015/09/how-to-perform-a-logistic-regression-in-r/)
 
 ```{r}
 
@@ -44,4 +44,16 @@ analysis_data <- patient_sample_mutations |>
   mutate_if(is.character, as.factor)
 ```
 
-# Fit Model
+# [Fit Model](https://www.r-bloggers.com/2015/09/how-to-perform-a-logistic-regression-in-r/)
+
+```{r}
+model <- glm(Survival ~.,family=binomial(link='logit'),data=analysis_data)
+
+summary(model)
+```
+
+```{r}
+anova(model, test="Chisq")
+```
+
+[Source: https://www.r-bloggers.com/2015/09/how-to-perform-a-logistic-regression-in-r/](https://www.r-bloggers.com/2015/09/how-to-perform-a-logistic-regression-in-r/)
