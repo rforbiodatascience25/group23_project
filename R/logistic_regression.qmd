@@ -1,13 +1,11 @@
 ---
-title: "correlation_matrix"
+title: "logistic_regression"
 format: html
 ---
 
 # Load Packages
 
 ```{r}
-library(polycor)
-library(corrplot)
 library(readr)
 library(here)
 library(tidyverse)
@@ -26,11 +24,10 @@ clinical_patient <- read.delim(here("data", "data_clinical_patient.txt"), sep = 
 # Clean Data
 
 ```{r}
-colnames(clinical_patient)
-```
 
-```{r}
-patient_clean <- clinical_patient |> select(-c(AGE_GROUP))
+patient_clean <- clinical_patient |> 
+  select(-c(AGE_GROUP))|>
+  mutate(Survival = str_sub(OS_STATUS, start = 1, end = 1))
 sample_clean <- clinical_sample |>
   select(c(PATIENT_ID, SAMPLE_ID,CANCER_TYPE, TMB_NONSYNONYMOUS, AGE_AT_SEQ_REPORT) )
 mutation_clean <- mutations |>
@@ -41,29 +38,10 @@ mutation_clean <- mutations |>
 
 patient_sample <- patient_clean |> left_join(sample_clean, by = 'PATIENT_ID')
 patient_sample_mutations <- patient_sample |> left_join(mutation_clean, by = 'SAMPLE_ID')
-```
 
-How many mutations per sample
-
-```{r}
-mutations |> group_by(Tumor_Sample_Barcode)|>
-  summarise(n= n())|>
-  ggplot(aes(n))+
-  geom_bar()
-```
-
-# Creating Correlation Matrix
-
-```{r}
 analysis_data <- patient_sample_mutations |> 
-  select(-c(PATIENT_ID, SAMPLE_ID))|>
+  select(-c(PATIENT_ID, SAMPLE_ID, OS_STATUS))|>
   mutate_if(is.character, as.factor)
-
-corrplot(correlation_matrix$correlations, method="color", tl.col="black", tl.srt=45)
-  
-
-
-correlation_matrix<- hetcor(analysis_data)
 ```
 
-\
+# Fit Model
