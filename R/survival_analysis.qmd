@@ -23,7 +23,7 @@ data_mutation <- read_tsv("/net/pupil1/home/people/s253729/R/r_for_bio_data_scie
 data_clinical_sample <- read_tsv("/net/pupil1/home/people/s253729/R/r_for_bio_data_science/group23_project/data/data_clinical_sample.txt",
                                  skip = 4)
 
-data_clinical_patient <- read_tsv("/net/pupil1/home/people/s253729/R/r_for_bio_data_science/group23_project/data/data_clinical_patient.txt",
+data_clinical_patient <- read_tsv("/net/pupil1/home/people/s253729/R/r_for_bio_data_science/group23_project/data/data_clinical_patient_clean",
                                   skip = 4)
 ```
 
