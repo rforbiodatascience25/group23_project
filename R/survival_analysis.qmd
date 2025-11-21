@@ -51,3 +51,7 @@ ggplot(tibble_KM_f,
 ```
 
 # Cox regression
+
+```{r}
+cox_model <- coxph()
+```
