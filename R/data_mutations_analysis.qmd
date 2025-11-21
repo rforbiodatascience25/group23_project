@@ -14,7 +14,7 @@ library(purrr)
 library(table1)
 ```
 
-# data import
+# Data import
 
 ```{r}
 data_mutation <- read_tsv("/net/pupil1/home/people/s253729/R/r_for_bio_data_science/group23_project/data/data_mutations.txt",
@@ -26,6 +26,10 @@ data_mutation <- read_tsv("/net/pupil1/home/people/s253729/R/r_for_bio_data_scie
 data_mutation |> 
   slice_sample(n = 5)
 ```
+
+# Data cleaning
+
+## NA handling
 
 We begin by looking at all the columns with all nas in it.
 
@@ -100,8 +104,10 @@ data_mutation_without_nas <- data_mutation_without_nas |>
   select(-c("dbSNP_RS"))
 ```
 
+## Explanation of the variables
+
 | Column name | What it is |
-|------------------------------------|------------------------------------|
+|----|----|
 | Hugo_Symbol | The **Name** of the gene. |
 | Entrez_Gene_Id | The gene's unique **ID number**. |
 | Chromosome | The specific chromosome where the mutation occurred |
@@ -278,6 +284,7 @@ data_mutation_without_nas_long <- data_mutation_without_nas_long |>
 ```{r}
 data_mutation_without_nas_long |> 
   sample_n(5)
+
 ```
 
 ```{r}
@@ -297,18 +304,6 @@ data_mutation_without_nas_long |>
 ```
 
 ```{r}
-#data_mutation_without_nas_long <-  data_mutation_without_nas_long |> 
-#  mutate(n_variant = str_count(Variant_Classification,",")+1)
-
-max_variants <- data_mutation_without_nas_long$n_variant |> 
-  max()
-sprintf("The max number of variants for one row is %.4f",max_variants)
-
-```
-
-So there is only one variant per row.
-
-```{r}
 data_mutation_without_nas_long |> 
   ggplot(aes( x = t_ref_count
                 )) + 
@@ -322,5 +317,9 @@ data_mutation_without_nas_long |>
   geom_boxplot()
 ```
 
-test 
+# Export the cleaned data
 
+```{r}
+data_mutation_without_nas_long |>
+  write_tsv(file = file.path('/net/pupil1/home/people/s253729/R/r_for_bio_data_science/group23_project/data','data_mutation_cleaned'))
+```
