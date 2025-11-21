@@ -60,6 +60,19 @@ patients |>
 ```
 
 ```{r}
+patients <- patients |>
+  mutate(
+    Age_average = case_when(
+      Age.Group.at.Diagnosis.in.Years == "<30" ~ 25,
+      Age.Group.at.Diagnosis.in.Years == "31-50" ~ 40,
+      Age.Group.at.Diagnosis.in.Years == "50-60" ~ 55,
+      Age.Group.at.Diagnosis.in.Years == "61-70" ~ 65,
+      Age.Group.at.Diagnosis.in.Years == ">71" ~ 75
+    )
+  )
+```
+
+```{r}
 patients <- patients |> 
   rename(Survival_Months = Overall.Survival..Months., 
          OS_status = Overall.Survival.Status,
@@ -68,26 +81,15 @@ patients <- patients |>
 ```
 
 ```{r}
-patients <- patients |>
-  mutate(
-    Age_num = case_when(
-      Age.Group.at.Diagnosis.in.Years == "<30" ~ 25,
-      Age.Group.at.Diagnosis.in.Years == "31-50" ~ 40,
-      Age.Group.at.Diagnosis.in.Years == "50-60" ~ 55,
-      Age.Group.at.Diagnosis.in.Years == "61-70" ~ 65,
-      Age.Group.at.Diagnosis.in.Years == ">71" ~ 75
-    )
-  )
-
+patients <- patients |> 
+  mutate(Survival_Months = as.numeric(Survival_Months))
 ```
 
 age group -\> make factors based on age group
 
 "early"
 
-Making a survival rate column, using the Kaplan-Meier survival analysis
-
-```{r}
+```{r Making a survival rate column, using the Kaplan-Meier survival analysis}
 
 patients$Survival_Months |> 
   sum()
@@ -101,14 +103,7 @@ We will be looking at the proportion of men vs women that have survived the canc
 
 bins = age group?
 
-facet =
-
-```{r}
-patients |> 
-  ggplot(mapping = aes(x = Age.Group.at.Diagnosis.in.Years, 
-                       fill =  Sex)) +
-  geom_bar()
-```
+facet
 
 ```{r}
 library(ggplot2)
@@ -137,18 +132,20 @@ patients |>
 
 ```{r}
 patients |>
-  filter(Age.Group.at.Diagnosis.in.Years == "61-70") |> 
+  filter(Age_group == "61-70") |> 
   ggplot(mapping = aes(x = Drug.Type,
-                       y = Overall.Survival..Months.,
-                       fill = Sex))+
-  geom_point()+
-  facet_wrap(~ Survival.Status.Clean)
+                       y = Survival_Months,
+                       fill = Survival.Status.Clean))+
+  geom_boxplot()+
+  facet_wrap(~ Sex)+
+  labs(title = 'Box Plot of the Drug success rate based on the proportion of patients still alive vs dead with the same drug')
+#Might not be the best way to represent it becase, how many patients total per drug? 
 ```
 
 How many months considered still alive?
 
 ```{r}
-summ_age <- count(patients$Age_num)
+summ_age <- count(patients$Age_average)
 patients |> 
   ggplot(aes(x = summ_age, y = Suvival.Status.Clean)) +
   geom_line(alpha = 0.4) 
@@ -162,7 +159,10 @@ patients$Survival_Months <- as.numeric(patients$Survival_Months)
 
 fit <- survfit(Surv(Survival_Months, OS_status) ~ Age_group, data = patients)
 
-ggsurvplot(fit, data = patients, legend = "right")
+#ggsurvplot(fit, data = patients, legend = "right") #Can't use -> its a mgical plot... 
+patient |> 
+  suvival <- Surv((Survival_Months, OS_status) ~ Age_group)|> 
+  ggplot(lm())
 
 ```
 
@@ -170,9 +170,41 @@ ggsurvplot(fit, data = patients, legend = "right")
 library(survival)
 library(survminer)
 
-patients$Overall.Survival..Months. <- as.numeric(patients$Overall.Survival..Months.)
+patients$Survival_Months <- as.numeric(patients$Survival_Months)
 
-fit <- survfit(Surv(Overall.Survival..Months., Overall.Survival.Status) ~ Drug.Type, data = patients)
-
+fit <- survfit(Surv(Survival_Months, OS_status) ~ Drug.Type, data = patients)
+print (fit)
 ggsurvplot(fit, data = patients)
+```
+
+From the course website we try to make a linear regression model
+
+```{r}
+my_glm_mdl <- glm(formula = OS_status ~ Survival_Months,
+                  family = binomial(link = "logit"),
+                  data = patients)
+my_glm_mdl
+```
+
+```{r}
+patients |>
+  mutate(my_glm_model = pluck(my_glm_mdl, "fitted.values")) |>
+  arrange(Survival_Months) |> 
+  ggplot(aes(x = Survival_Months,
+             y = OS_status)) +
+  geom_point(alpha = 0.5,
+             size = 3)+
+  geom_line(aes(y = my_glm_model))
+
+```
+
+## **Creating survival objects and curves**
+
+The Kaplan-Meier method is the most common way to estimate survival times and probabilities. It is a non-parametric approach that results in a step function, where there is a step down each time an event occurs.
+
+```{r}
+patients |> 
+  Survival_Months |>
+  total <- n
+  
 ```
