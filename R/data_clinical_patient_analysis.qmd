@@ -1,0 +1,210 @@
+---
+title: "data_clinical_patient_analysis"
+author: "Romane"
+format: html
+editor: visual
+---
+
+## Importing libraries
+
+```{r}
+#| echo : False
+library("tidyverse")
+```
+
+## Importing data
+
+```{r}
+getwd()
+```
+
+```{r}
+file.exists("../data/data_clinical_patient.txt")
+
+```
+
+```{r}
+raw_patients <- read.csv(file = "../data/data_clinical_patient.txt", sep = "\t")
+#open txt file as a csv, sepertation as tabs: "\t"
+```
+
+```{r}
+#removing the 4 first rows that "explain" the columns
+patients <- raw_patients[-c(1,2,3,4),]
+```
+
+## Data Wrangling
+
+```{r}
+#Changing the OS status to numeric + adding a column to make it clearer (in case)
+#0 for the Living patients
+#1 for the patients that died
+patients <- patients |> 
+  mutate( 
+    Overall.Survival.Status = case_when(Overall.Survival.Status == "0:LIVING" ~ 0,
+                                        Overall.Survival.Status == "1:DECEASED" ~ 1),
+    Survival.Status.Clean = case_when(Overall.Survival.Status == 0 ~ "Living",
+                                        Overall.Survival.Status == 1 ~ "Deceased")
+  )
+```
+
+More data wrangling could be done?
+
+```{r}
+patients |> 
+  mutate(Age.Group.at.Diagnosis.in.Years = factor(
+      Age.Group.at.Diagnosis.in.Years,
+      levels = c("<30", "31-50", "50-60", "61-70", ">71"),
+      ordered = TRUE
+    ),)
+```
+
+```{r}
+patients <- patients |>
+  mutate(
+    Age_average = case_when(
+      Age.Group.at.Diagnosis.in.Years == "<30" ~ 25,
+      Age.Group.at.Diagnosis.in.Years == "31-50" ~ 40,
+      Age.Group.at.Diagnosis.in.Years == "50-60" ~ 55,
+      Age.Group.at.Diagnosis.in.Years == "61-70" ~ 65,
+      Age.Group.at.Diagnosis.in.Years == ">71" ~ 75
+    )
+  )
+```
+
+```{r}
+patients <- patients |> 
+  rename(Survival_Months = Overall.Survival..Months., 
+         OS_status = Overall.Survival.Status,
+         Age_group = Age.Group.at.Diagnosis.in.Years,
+         Patient_ID = X.Patient.Identifier)
+```
+
+```{r}
+patients <- patients |> 
+  mutate(Survival_Months = as.numeric(Survival_Months))
+```
+
+age group -\> make factors based on age group
+
+"early"
+
+```{r Making a survival rate column, using the Kaplan-Meier survival analysis}
+
+patients$Survival_Months |> 
+  sum()
+patients |> 
+  mutate(Survival_Rate = sum(Survival_Months$OS_status==0))
+```
+
+## Plots
+
+We will be looking at the proportion of men vs women that have survived the cancer depending on their age and then depending on the type of treatment they received. (Survival proportion per treatment)
+
+bins = age group?
+
+facet
+
+```{r}
+library(ggplot2)
+library(Cairo)
+
+order = c('<30', '31-50', '50-60', '61-70', '>71')
+patients |>
+  ggplot(aes(x = factor(Age.Group.at.Diagnosis.in.Years, levels = order),
+             fill = Sex)) +
+  geom_bar(position = "dodge")+
+  labs(title="Proportion of Cancer diagnosed in Men and Woman at different ages", 
+       x = "Age group at Diagnosis (years)")
+  #facet_wrap(~ Suvival.Status.Clean)
+```
+
+Most cases of cancer Seem to be diagnosed in between the ages of 61 to 70, for both man and woman. In general there seems to be more cases of cancers in man.
+
+```{r}
+patients |> 
+  filter(Age.Group.at.Diagnosis.in.Years == "61-70") |> 
+  ggplot(mapping = aes(x = Drug.Type,
+                       fill = Sex))+
+  geom_bar(position = "dodge")+
+  facet_wrap(~ Overall.Survival..Months.)
+```
+
+```{r}
+patients |>
+  filter(Age_group == "61-70") |> 
+  ggplot(mapping = aes(x = Drug.Type,
+                       y = Survival_Months,
+                       fill = Survival.Status.Clean))+
+  geom_boxplot()+
+  facet_wrap(~ Sex)+
+  labs(title = 'Box Plot of the Drug success rate based on the proportion of patients still alive vs dead with the same drug')
+#Might not be the best way to represent it becase, how many patients total per drug? 
+```
+
+How many months considered still alive?
+
+```{r}
+summ_age <- count(patients$Age_average)
+patients |> 
+  ggplot(aes(x = summ_age, y = Suvival.Status.Clean)) +
+  geom_line(alpha = 0.4) 
+```
+
+```{r}
+library(survival)
+library(survminer)
+
+patients$Survival_Months <- as.numeric(patients$Survival_Months)
+
+fit <- survfit(Surv(Survival_Months, OS_status) ~ Age_group, data = patients)
+
+#ggsurvplot(fit, data = patients, legend = "right") #Can't use -> its a mgical plot... 
+patient |> 
+  suvival <- Surv((Survival_Months, OS_status) ~ Age_group)|> 
+  ggplot(lm())
+
+```
+
+```{r}
+library(survival)
+library(survminer)
+
+patients$Survival_Months <- as.numeric(patients$Survival_Months)
+
+fit <- survfit(Surv(Survival_Months, OS_status) ~ Drug.Type, data = patients)
+print (fit)
+ggsurvplot(fit, data = patients)
+```
+
+From the course website we try to make a linear regression model
+
+```{r}
+my_glm_mdl <- glm(formula = OS_status ~ Survival_Months,
+                  family = binomial(link = "logit"),
+                  data = patients)
+my_glm_mdl
+```
+
+```{r}
+patients |>
+  mutate(my_glm_model = pluck(my_glm_mdl, "fitted.values")) |>
+  arrange(Survival_Months) |> 
+  ggplot(aes(x = Survival_Months,
+             y = OS_status)) +
+  geom_point(alpha = 0.5,
+             size = 3)+
+  geom_line(aes(y = my_glm_model))
+
+```
+
+## **Creating survival objects and curves**
+
+The Kaplan-Meier method is the most common way to estimate survival times and probabilities. It is a non-parametric approach that results in a step function, where there is a step down each time an event occurs.
+
+```{r}
+patients |> 
+  Survival_Months |>
+  total <- n
+  
+```
