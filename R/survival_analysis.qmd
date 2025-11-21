@@ -52,6 +52,8 @@ ggplot(tibble_KM_f,
 
 # Cox regression
 
+Cox regression for hazard analysis
+
 ```{r}
 cox_model <- coxph()
 ```
