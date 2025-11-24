@@ -161,26 +161,84 @@ patients |>
 library(survival)
 library(survminer)
 
+#Using the Kaplan Meier based survival function: 
+
 patients$Survival_Months <- as.numeric(patients$Survival_Months)
 
-fit <- survfit(Surv(Survival_Months, OS_status) ~ Age_group, data = patients)
+KM_f <- survfit(Surv(Survival_Months, OS_status) ~1, data = patients)
 
-#ggsurvplot(fit, data = patients, legend = "right") #Can't use -> its a mgical plot... 
+#convert to a tibble
 
+tibble_KM_f <- tibble(
+  time = fit$time,
+  survival = fit$surv)
+print(tibble_fit)
+
+ggplot(tibble_KM_f, 
+       mapping = aes(x = time,
+                     y = survival))+
+  geom_line()+
+  labs(title = 'Overall Survival rate of the patients')
 
 ```
 
 ```{r}
-#Survival Curve, Kapln Meier based
-#Not sure I can use this becasue it's a magic plot 
-library(survival)
-library(survminer)
+library(dplyr)
+
+km_curve <- patients %>%
+  arrange(Survival_Months) %>%
+  group_by(Survival_Months) %>% 
+  summarise(
+    events  = sum(OS_status == 1),
+    cens    = sum(OS_status == 0),
+    n       = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    n_risk = rev(cumsum(rev(n + 0))),      # total at risk before events
+    step   = 1 - (events / n_risk),        # KM step
+    surv   = cumprod(step)                 # cumulative product = KM estimate
+  )
+
+km_curve
+
+ggplot(km_curve,
+       mapping = aes(x = Survival_Months,
+                     y = surv))+
+  geom_line()
+
+```
+
+```{r}
+
+#Using the Kaplan Meier based survival function, declining it to the different sobservations that we can make
+#survival rate based on the gender of the patients:
 
 patients$Survival_Months <- as.numeric(patients$Survival_Months)
 
-fit <- survfit(Surv(Survival_Months, OS_status) ~ Drug.Type, data = patients)
-print (fit)
-ggsurvplot(fit, data = patients)
+KM_f <- survfit(Surv(Survival_Months, OS_status) ~Sex, data = patients)
+
+#convert to a tibble
+#print(summary(KM_f))
+names(KM_f)
+print(KM_f)
+tibble_KM_f <- tibble(
+  time = KM_f$time,
+  survival = KM_f$surv,
+  strata = rep(names(KM_f$strata),KM_f$strata))
+print(tibble_KM_f)
+ggplot(tibble_KM_f,
+       mapping = aes(x = time, 
+                     y = survival, 
+                     color = strata))+
+  geom_line()
+print(tibble_KM_f)
+
+print(KM_f$strata)
+```
+
+```{r}
+
 ```
 
 From the course website we try to make a linear regression model
@@ -193,6 +251,7 @@ my_glm_mdl
 ```
 
 ```{r}
+order = c('<30', '31-50', '50-60', '61-70', '>71')
 patients |>
   mutate(my_glm_model = pluck(my_glm_mdl, "fitted.values")) |>
   arrange(Survival_Months) |> 
@@ -200,7 +259,8 @@ patients |>
              y = OS_status)) +
   geom_point(alpha = 0.5,
              size = 3)+
-  geom_line(aes(y = my_glm_model))
+  geom_line(aes(y = my_glm_model))+
+  facet_wrap(~ Age_group)
 
 ```
 
@@ -214,7 +274,7 @@ To get a survival curve we would need to use the Kaplan-Meier model.
 patient |> 
   suvival <- Surv((Survival_Months, OS_status) ~ Age_group)|> 
   ggplot()+
-  geom_line(aes(y = my_glm_model))
+  geom_line(aes(y = my_glm_model, ~ Age_group))
 ```
 
 ## **Creating survival objects and curves**
