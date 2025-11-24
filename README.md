@@ -4,6 +4,8 @@
 
 ### data_clinical_patient.txt
 
+This file contains the main informations of all the patients that were studied, it contains 6 columns, patient ID, sex, age at diagnosis, drug received, the "survived month" and their overall status (alive or dead, at the time of the check up). From this data set it is possible to look at the survival rate of the patients and see if different factors such as the medication or the age may have an impact on the survival rate.
+
 ### data_gene_panel_matrix.txt
 
 ### data_mutations.txt

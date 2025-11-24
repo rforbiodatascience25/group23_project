@@ -31,4 +31,23 @@ Need sex, age, cancer type to be transformed to numerical categories
 
 # Kaplan-Meier curve
 
+```{r}
+patients$Survival_Months <- as.numeric(patients$Survival_Months)
+
+KM_f <- survfit(Surv(Survival_Months, OS_status) ~1, data = patients)
+
+#convert to a tibble
+
+tibble_KM_f <- tibble(
+  time = fit$time,
+  survival = fit$surv)
+print(tibble_fit)
+
+ggplot(tibble_KM_f, 
+       mapping = aes(x = time,
+                     y = survival))+
+  geom_line()+
+  labs(title = 'Overall Survival rate of the patients')
+```
+
 # Cox regression

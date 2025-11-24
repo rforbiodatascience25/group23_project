@@ -87,7 +87,7 @@ patients <- patients |>
 
 ```{r}
 patients |> 
-  write_tsv(file = file.path("/net/pupil1/home/people/s243419/R_for_bio_data_science/projects/group23_project/data",'data_clinical_patients_clean'))
+  write_tsv(file = file.path("/net/pupil1/home/people/s243419/R_for_bio_data_science/projects/group23_project/data",'data_clinical_patients_clean.tsv'))
 
 ```
 
@@ -166,13 +166,13 @@ patients$Survival_Months <- as.numeric(patients$Survival_Months)
 fit <- survfit(Surv(Survival_Months, OS_status) ~ Age_group, data = patients)
 
 #ggsurvplot(fit, data = patients, legend = "right") #Can't use -> its a mgical plot... 
-patient |> 
-  suvival <- Surv((Survival_Months, OS_status) ~ Age_group)|> 
-  ggplot(lm())
+
 
 ```
 
 ```{r}
+#Survival Curve, Kapln Meier based
+#Not sure I can use this becasue it's a magic plot 
 library(survival)
 library(survminer)
 
@@ -185,7 +185,7 @@ ggsurvplot(fit, data = patients)
 
 From the course website we try to make a linear regression model
 
-```{r}
+```{r Logistic Regression Model}
 my_glm_mdl <- glm(formula = OS_status ~ Survival_Months,
                   family = binomial(link = "logit"),
                   data = patients)
@@ -204,13 +204,34 @@ patients |>
 
 ```
 
+Death rate decreases over time
+
+However, the problem with a GLM, is that it does not take into account the "censored" patients, some patients are alive after 4 months but there is no later update. The data does not follow the patient until the end yet GML assumes it does.
+
+To get a survival curve we would need to use the Kaplan-Meier model.
+
+```{r}
+patient |> 
+  suvival <- Surv((Survival_Months, OS_status) ~ Age_group)|> 
+  ggplot()+
+  geom_line(aes(y = my_glm_model))
+```
+
 ## **Creating survival objects and curves**
 
 The Kaplan-Meier method is the most common way to estimate survival times and probabilities. It is a non-parametric approach that results in a step function, where there is a step down each time an event occurs.
 
 ```{r}
 patients |> 
-  Survival_Months |>
-  total <- n
+  arrange(Survival_Months) |> 
+  #Runs from 0 to 14 months
+  total_patients <- count() |>
+  filter(Survival_Months == 0) |> 
+  filter(OS_status == 1) |> 
+  dead_m0 <- count() |> 
+  p_m0 <- (total_patients-dead_m0)/total_patients
+  
+
+
   
 ```
