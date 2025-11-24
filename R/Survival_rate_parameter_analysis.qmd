@@ -1,0 +1,112 @@
+---
+title: "Survival Rate - Multi parameter analysis"
+format: html
+editor: visual
+---
+
+## Loading Libraries
+
+```{r}
+library('tidyverse')
+library('Cairo')
+library('Survival')
+```
+
+## Loading Data
+
+```{r}
+patients <- read_tsv('/net/pupil1/home/people/s243419/R_for_bio_data_science/projects/group23_project/data/data_clinical_patients_clean.tsv')
+sample <- read_csv('/net/pupil1/home/people/s243419/R_for_bio_data_science/projects/group23_project/data/data_clinical_sample.txt', sep = '\t')
+mutation_clean
+
+
+```
+
+```{r}
+names(patient_sample_mutations)
+```
+
+## Data Wrangling
+
+```{r}
+
+patient_sample_mutations <- patient_sample_mutations |> 
+  mutate(OS_STATUS = case_when(OS_STATUS == '1:DECEASED' ~ 1, 
+                                                         OS_STATUS == '0:LIVING' ~ 0))
+```
+
+## Survival Rate Analysis
+
+```{r}
+names(patient_sample_mutations)
+```
+
+### By Cancer Type
+
+```{r}
+
+KM_f <- survfit(Surv(OS_MONTHS, OS_STATUS) ~CANCER_TYPE, data = patient_sample_mutations)
+
+#convert to a tibble
+#print(summary(KM_f))
+names(KM_f)
+print(KM_f)
+tibble_KM_f <- tibble(
+  time = KM_f$time,
+  survival = KM_f$surv,
+  strata = rep(names(KM_f$strata),KM_f$strata))
+print(tibble_KM_f)
+ggplot(tibble_KM_f,
+       mapping = aes(x = time, 
+                     y = survival, 
+                     color = strata))+
+  geom_line()+
+  labs(title = 'Survival Curve of the patients depending on their Cancer type', color = 'Cancer Type')+
+  scale_color_discrete(label = factor(patient_sample_mutations$CANCER_TYPE))
+```
+
+### By TMB (mutation burden)
+
+```{r}
+KM_f <- survfit(Surv(OS_MONTHS, OS_STATUS) ~TMB_NONSYNONYMOUS, data = patient_sample_mutations)
+
+#convert to a tibble
+#print(summary(KM_f))
+names(KM_f)
+print(KM_f)
+tibble_KM_f <- tibble(
+  time = KM_f$time,
+  survival = KM_f$surv,
+  strata = rep(names(KM_f$strata),KM_f$strata))
+print(tibble_KM_f)
+ggplot(tibble_KM_f,
+       mapping = aes(x = time, 
+                     y = survival, 
+                     color = strata))+
+  geom_line()+
+  labs(title = 'Survival Curve of the patients depending on their TMB', color = 'TMB')+
+  scale_color_discrete(label = factor(patient_sample_mutations$TMB_NONSYNONYMOUS))
+```
+
+### By mutation type
+
+```{r}
+KM_f <- survfit(Surv(OS_MONTHS, OS_STATUS) ~n_mutations, data = patient_sample_mutations)
+
+#convert to a tibble
+#print(summary(KM_f))
+names(KM_f)
+print(KM_f)
+tibble_KM_f <- tibble(
+  time = KM_f$time,
+  survival = KM_f$surv,
+  strata = rep(names(KM_f$strata),KM_f$strata))
+print(tibble_KM_f)
+ggplot(tibble_KM_f,
+       mapping = aes(x = time, 
+                     y = survival, 
+                     color = strata))+
+  geom_line()+
+  labs(title = 'Survival Curve of the patients depending on their mutation', color = 'mutation number (or type?)')+
+  scale_color_discrete(label = factor(patient_sample_mutations$n_mutations))
+```
