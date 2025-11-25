@@ -94,7 +94,7 @@ sv_clinic_augm |> filter(Class != "TRANSLOCATION") |>
   theme_minimal() 
 ```
 
-**Repartition of SVs among chromosomes?**
+Density plot + histogram overlapped
 
 ### Is a gene recurrent in SVs ?
 
@@ -216,3 +216,5 @@ clinical_with_sv |>
        x = NULL,
        y = "TMB (log scale)")
 ```
+
+Add legend primary/metastasis
