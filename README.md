@@ -34,3 +34,26 @@ Detailed information for each column with examples can be found in the descripti
 -   comparison number of mutations and IMPACT version(Francesc)
 -   Kind of mutation to TMB, Metastasis(Maxence)
 -   Kind of Mutations numbers(Maxence)
+
+# New TODOs:
+
+-   get data script, download data from web and clean(louis), into raw and data folder
+
+-   bar plot: numbers of mutation, but stacked with kind of mutation(Louis data set)
+
+-   data description in read-me+ clean up
+
+-   mutation analysis of glioma samples(Maxence)
+
+-   do analysis on subset of cancer type = glioma(Cora, Louis, maybe Romane)
+
+-   structure github
+
+# Presentation:
+
+1.  Introduction to our data(give background)(cancer data, study, data formats in the 5 files)
+2.  Material(Francesc) with Impact
+3.  Overview over data, general plots
+4.  Patient information(age distribution, sex, number of patients, etc)(barplot age &sex stacked)+ survival rate
+5.  SV+most mutated gene+most present in Glioma
+6.  Network based on glioma
