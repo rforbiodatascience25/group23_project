@@ -146,10 +146,16 @@ newdata <- data.frame(
 )
 
 surv_fit <- survfit(cox_model_age_gender, newdata = newdata)
+risk_table_data <- summary(surv_fit)$table
 
+risk_table_data
+```
+
+```{r}
 ggsurvplot(
   surv_fit,
   data = newdata, 
+  legend.labs = c("Female", "Male"),
   conf.int = TRUE,  
   pval = TRUE,  
   risk.table = TRUE,  # Add a table of at-risk individuals
