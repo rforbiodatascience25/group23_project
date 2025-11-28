@@ -178,6 +178,9 @@ df_gender |>
         ) 
   ) + 
   geom_bar() +
+  scale_fill_viridis(option = "viridis",
+                     discrete = TRUE
+                     )+
   labs(title = "Count of the age_group stratified by gender") +
   theme_classic()
 ```
@@ -258,6 +261,10 @@ df_glioma_gender |>
   ) +
   geom_boxplot(position = position_dodge(width = 0.8), linewidth = 0.8) + 
   facet_wrap(~Age_group) + 
+  scale_fill_viridis(option = "viridis",
+                     discrete = TRUE,
+                     begin = 0.5
+                     )+
   labs(title = "Influence of the gender on the survival states, stratified by age group") +
   theme_classic() 
 
@@ -308,10 +315,11 @@ df_glioma_gender |>
         ) 
   ) + 
   geom_bar() +
-  labs(title = "Count of the age_group stratified by gender") +
+  scale_fill_viridis(option = "viridis",
+                     discrete = TRUE
+                     )+
+  labs(title = "Count of the age_group stratified by gender for the Glioma sample") +
   theme_classic()
 ```
 
 So we can see two things: first we have very few samples for the agre groups before 30 yo and after 71 yo, second there are more male than female. This two differences combined with the few number of samples are very likely to bias our study.
-
-What about for all cancer_types in general?
