@@ -8,16 +8,25 @@ editor: visual
 
 ```{r}
 library('tidyverse')
-library('Cairo')
-library('Survival')
+library('survival')
+library('here')
 ```
 
 ## Loading Data
 
 ```{r}
+current_path <- here('data')
+print(current_path)
+```
+
+```{r}
+getwd()
+```
+
+```{r}
 patients <- read_tsv('/net/pupil1/home/people/s243419/R_for_bio_data_science/projects/group23_project/data/data_clinical_patients_clean.tsv')
-sample <- read_csv('/net/pupil1/home/people/s243419/R_for_bio_data_science/projects/group23_project/data/data_clinical_sample.txt', sep = '\t')
-mutation_clean
+sample <- read.csv('/net/pupil1/home/people/s243419/R_for_bio_data_science/projects/group23_project/raw/tmb_mskcc_2018/data_clinical_sample.txt', sep = '\t', skip = 4, header = TRUE)
+mutations <- read.delim(here("data", "data_mutation_cleaned"), sep = "\t", header = TRUE)
 
 
 ```
@@ -29,46 +38,95 @@ names(patient_sample_mutations)
 ## Data Wrangling
 
 ```{r}
+names(sample)
+```
+
+```{r}
+patients <- patients |>  
+  select(-c(Age_group)) |> 
+  rename(PATIENT_ID = Patient_ID)
+patients_sample <- left_join(sample, patients, by = 'PATIENT_ID')
+
+
+```
+
+```{r}
 
 patient_sample_mutations <- patient_sample_mutations |> 
   mutate(OS_STATUS = case_when(OS_STATUS == '1:DECEASED' ~ 1, 
                                                          OS_STATUS == '0:LIVING' ~ 0))
 ```
 
-## Survival Rate Analysis
-
 ```{r}
-names(patient_sample_mutations)
+#Comparing the number of mutation, and the drug given, in the case of Glioma cancer
+patients_sample <- patients_sample |> 
+  mutate(TMB_group = case_when(TMB_NONSYNONYMOUS<5 ~'low TMB',
+                               5<=TMB_NONSYNONYMOUS & TMB_NONSYNONYMOUS<20 ~'Intermediate TMB',
+                               TMB_NONSYNONYMOUS>=20 ~'high TMB'))
+
+patients_sample |> 
+  ggplot(mapping = aes(x = TMB_group,
+                       fill = Drug.Type))+
+  geom_bar()+
+  labs(tile = 'Bar plot of Drug given againts different severity of TMB (Tumor Mutational Burden', x = 'TMB Severity')
 ```
+
+## Survival Rate Analysis
 
 ### By Cancer Type
 
+Does the cancer type affects the survival of patients?
+
 ```{r}
 
-KM_f <- survfit(Surv(OS_MONTHS, OS_STATUS) ~CANCER_TYPE, data = patient_sample_mutations)
+KM_f <- survfit(Surv(Survival_Months, OS_status) ~CANCER_TYPE, data = patients_sample)
 
 #convert to a tibble
-#print(summary(KM_f))
-names(KM_f)
-print(KM_f)
+print(summary(KM_f))
+#names(KM_f)
+print(KM_f$strata)
 tibble_KM_f <- tibble(
   time = KM_f$time,
   survival = KM_f$surv,
-  strata = rep(names(KM_f$strata),KM_f$strata))
-print(tibble_KM_f)
+  strata = rep(names(KM_f$strata), KM_f$strata))
+#print(tibble_KM_f)
+
+tibble_KM_f <- tibble_KM_f %>%
+  mutate(strata = str_remove(strata, "CANCER_TYPE="))
+
 ggplot(tibble_KM_f,
        mapping = aes(x = time, 
                      y = survival, 
                      color = strata))+
-  geom_line()+
-  labs(title = 'Survival Curve of the patients depending on their Cancer type', color = 'Cancer Type')+
-  scale_color_discrete(label = factor(patient_sample_mutations$CANCER_TYPE))
+  geom_step()+
+  labs(title = 'Survival Curve of the patients depending on their Cancer type', color = 'Cancer Type')
+#hmm why does the cancer type repeats itself?? wrong
+  
+```
+
+```{r}
+ggplot(patients_sample,
+       mapping = aes(x = CANCER_TYPE, 
+                     fill = Drug.Type))+
+  geom_bar()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+\
+select(-c(Age_group)) patients_sample \<- left_join(sample, patients, by = 'Patient_ID'))
+
+#scale_color_discrete(label = factor(tibble_KM_f\$strata))
+
+```{r}
+patients_sample_glioma <- patients_sample |> 
+  filter(CANCER_TYPE == "Glioma")
 ```
 
 ### By TMB (mutation burden)
 
 ```{r}
-KM_f <- survfit(Surv(OS_MONTHS, OS_STATUS) ~TMB_NONSYNONYMOUS, data = patient_sample_mutations)
+
+KM_f <- survfit(Surv(Survival_Months, OS_status) ~TMB_group, data = patients_sample_glioma)
 
 #convert to a tibble
 #print(summary(KM_f))
@@ -78,23 +136,37 @@ tibble_KM_f <- tibble(
   time = KM_f$time,
   survival = KM_f$surv,
   strata = rep(names(KM_f$strata),KM_f$strata))
-print(tibble_KM_f)
+tibble_KM_f <- tibble_KM_f %>%
+  mutate(strata = str_remove(strata, "TMB_group="))
 ggplot(tibble_KM_f,
        mapping = aes(x = time, 
                      y = survival, 
                      color = strata))+
-  geom_line()+
-  labs(title = 'Survival Curve of the patients depending on their TMB', color = 'TMB')+
-  scale_color_discrete(label = factor(patient_sample_mutations$TMB_NONSYNONYMOUS))
+  geom_step()+
+  labs(title = 'Survival Curve of the patients depending on their TMB', color = 'TMB severity', )
 ```
-
-### By mutation type
 
 ```{r}
-KM_f <- survfit(Surv(OS_MONTHS, OS_STATUS) ~n_mutations, data = patient_sample_mutations)
+#looking at the repartition of TMBs in the different sections
+ggplot(patients_sample_glioma, 
+       mapping = aes(x = TMB_group))+
+  geom_bar()
+```
 
-#convert to a tibble
-#print(summary(KM_f))
+```{r}
+ggplot(patients_sample_glioma, 
+       mapping = aes(x = (TMB_group), 
+                     fill = Drug.Type))+
+  geom_bar()
+```
+
+### By mutation number
+
+```{r}
+
+KM_f <- survfit(Surv(Survival_Months, OS_status) ~ n_mutation_log, data = patients_sample)
+
+
 names(KM_f)
 print(KM_f)
 tibble_KM_f <- tibble(
@@ -106,7 +178,32 @@ ggplot(tibble_KM_f,
        mapping = aes(x = time, 
                      y = survival, 
                      color = strata))+
-  geom_line()+
-  labs(title = 'Survival Curve of the patients depending on their mutation', color = 'mutation number (or type?)')+
-  scale_color_discrete(label = factor(patient_sample_mutations$n_mutations))
+  geom_step()+
+  labs(title = 'Survival Curve of the patients with a glioma cancer depending on the number of mutations they have (log scale)', color = 'number of mutation')+
+  scale_color_discrete(label = factor(patients_sample$n_mutation_log))
 ```
+
+```{r}
+patient_sample_mutation |> 
+  filter(CANCER_TYPE == 'Glioma') |> 
+  KM_f <- survfit(Surv(OS_MONTHS, OS_STATUS) ~ n_mutation_log)
+
+
+names(KM_f)
+print(KM_f)
+tibble_KM_f <- tibble(
+  time = KM_f$time,
+  survival = KM_f$surv,
+  strata = rep(names(KM_f$strata),KM_f$strata))
+print(tibble_KM_f)
+ggplot(tibble_KM_f,
+       mapping = aes(x = time, 
+                     y = survival, 
+                     color = strata))+
+  geom_step()+
+  labs(title = 'Survival Curve of the patients with a glioma cancer depending on the number of mutations they have (log scale)', color = 'number of mutation')+
+  scale_color_discrete(label = factor(patient_sample_mutations$n_mutation_log))
+  
+```
+
+Does the number of mutation affect the survival and thus is an indicator of the severity of the cancer?

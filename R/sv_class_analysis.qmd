@@ -134,6 +134,54 @@ EGFR_SV |>
 
 EGFR is involved in 30 SVs, and among these 25 are deletion!
 
+Are there other SVs in glioma samples ?
+
+```{r}
+
+glioma_SV <- sv_clinic_augm |> 
+  filter(CANCER_TYPE == "Glioma") 
+
+glioma_SV |> 
+  ggplot(aes(x = Class, fill = Class)) +
+  geom_bar(color = "black", alpha = 0.8) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+glioma_SV |> 
+  ggplot(aes(x = Site1_Hugo_Symbol, fill = Class)) +
+  geom_bar(color = "black", alpha = 0.8) +
+  coord_flip() +
+  theme_minimal() 
+
+glioma_SV |> 
+  ggplot(aes(x = Site2_Hugo_Symbol, fill = Class)) +
+  geom_bar(color = "black", alpha = 0.8) +
+  coord_flip() +
+  theme_minimal() 
+```
+
+### Study of mutations for glioma sample
+
+```{r}
+
+data_mutations <- read_tsv(file = here('data','data_mutation_cleaned'))
+
+mutations_augm_pat <- data_mutations |> 
+  left_join(clinical_clean, by = c("Tumor_Sample_Barcode" = "SAMPLE_ID"))
+
+glioma_mut <- mutations_augm_pat |> 
+  filter(CANCER_TYPE == "Glioma")
+```
+
+```{r}
+
+glioma_mut |> 
+  count(Hugo_Symbol, sort = TRUE) |>  
+  slice_head(n = 10)
+
+table(glioma_mut$Chromosome)
+```
+
 ### Link between SVs, TMB and cancer types
 
 While TMB captures nucleotide-level errors, SVs represent structural genomic instability.

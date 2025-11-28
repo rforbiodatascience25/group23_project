@@ -19,16 +19,7 @@ library('survminer')
 ## Importing data
 
 ```{r}
-getwd()
-```
-
-```{r}
-file.exists("../data/data_clinical_patient.txt")
-
-```
-
-```{r}
-raw_patients <- read.csv(file = "../data/data_clinical_patient.txt", sep = "\t")
+raw_patients <- read.csv(file = "../raw/tmb_mskcc_2018/data_clinical_patient.txt",sep = "\t", header = TRUE)
 #open txt file as a csv, sepertation as tabs: "\t"
 ```
 
@@ -56,7 +47,7 @@ patients <- patients |>
   mutate( 
     OS_status = case_when(OS_status == "0:LIVING" ~ 0,
                           OS_status == "1:DECEASED" ~ 1), 
-    Sex = case_when(Sex == 'Male' ~ 0,
+    Sex_num = case_when(Sex == 'Male' ~ 0,
                     Sex == 'Female' ~ 1))
 ```
 
@@ -92,7 +83,7 @@ patients <- patients |>
 
 ```{r}
 current_raw_data_path <- here('data')
-#
+
 patients |> 
   write_tsv(file = file.path(current_raw_data_path,'data_clinical_patients_clean.tsv'))
 
@@ -131,8 +122,7 @@ patients |>
   filter(Age_group == "61-70") |> 
   ggplot(mapping = aes(x = Drug.Type,
                        fill = factor(Sex)))+
-  geom_bar(position = "dodge")+
-  facet_wrap(~ Survival_Months)
+  geom_bar(position = "dodge")
 ```
 
 ```{r}
@@ -143,12 +133,15 @@ patients |>
                        fill = factor(OS_status)))+
   geom_boxplot()+
   facet_wrap(~ Sex)+
-  labs(title = 'Box Plot of the Drug success rate based on the proportion of patients still alive vs dead with the same drug', fill = 'Status')+
-  scale_fill_discrete(label = c('Alive', "Desceased"))
+  labs(title = 'Box Plot of the Drug success rate based on the proportion of patients still alive vs dead with the same drug', fill = 'Status', x = 'Drug Type against Cancer', y = 'Number of months survived')+
+  scale_fill_discrete(label = c('Alive', "Desceased"))+
+  theme()
 #Might not be the best way to represent it becase, how many patients total per drug? 
 ```
 
 How many months considered still alive?
+
+outliers-\> drop?
 
 ```{r}
 summ_age <- count(patients$Age_average)
@@ -166,15 +159,18 @@ KM_f <- survfit(Surv(Survival_Months, OS_status) ~1, data = patients)
 #convert to a tibble
 
 tibble_KM_f <- tibble(
-  time = fit$time,
-  survival = fit$surv)
-print(tibble_fit)
+  time = KM_f$time,
+  survival = KM_f$surv)
+print(tibble_KM_f)
 
 ggplot(tibble_KM_f, 
        mapping = aes(x = time,
                      y = survival))+
-  geom_line()+
+  geom_step()+
   labs(title = 'Overall Survival rate of the patients')
+#change y min to 0 bcs they are not ALL dead 
+#x max needs to change too
+
 
 ```
 
@@ -199,7 +195,7 @@ ggplot(tibble_KM_f,
        mapping = aes(x = time, 
                      y = survival, 
                      color = strata))+
-  geom_line()+
+  geom_step()+
   labs(title = 'Survival Curve of the patients depending on their gender', color = 'Gender')+
   scale_color_discrete(label = c('Female', 'Male'))
 ```
@@ -220,7 +216,7 @@ ggplot(tibble_KM_f,
        mapping = aes(x = time, 
                      y = survival, 
                      color = strata))+
-  geom_line()+
+  geom_step()+
   labs(title = 'Survival Curve of the patients depending on their Age at the dignostic', color = 'Age Group')+
   scale_color_discrete(label = order)
 ```
@@ -241,7 +237,7 @@ ggplot(tibble_KM_f,
        mapping = aes(x = time, 
                      y = survival, 
                      color = strata))+
-  geom_line()+
+  geom_step()+
   labs(title = 'Survival Curve of the patients depending on their Medicationr', color = 'Drug')+
   scale_color_discrete(label = c('CTLA4', 'PD-1/PDL-1', 'Combo'))
 ```
@@ -274,13 +270,6 @@ Death rate decreases over time
 However, the problem with a GLM, is that it does not take into account the "censored" patients, some patients are alive after 4 months but there is no later update. The data does not follow the patient until the end yet GML assumes it does.
 
 To get a survival curve we would need to use the Kaplan-Meier model.
-
-```{r}
-patient |> 
-  suvival <- Surv((Survival_Months, OS_status) ~ Age_group)|> 
-  ggplot()+
-  geom_line(aes(y = my_glm_model, ~ Age_group))
-```
 
 ## **Creating survival objects and curves**
 
