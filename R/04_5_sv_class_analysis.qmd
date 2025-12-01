@@ -1,0 +1,245 @@
+---
+title: "Structural Variant analysis"
+format: 
+  html:
+      self-contained: true
+editor: visual
+output-dir: "results"
+---
+
+## Import library
+
+```{r}
+#| message: false
+library(tidyverse)
+library(ggplot2)
+library(here)
+library(viridis)
+```
+
+## Import data
+
+```{r}
+data_sv <- read_tsv(here("data", "sv_cleaned.tsv"))
+
+data_patient_sample <- read_tsv(here("data", "patient_sample_gene_panel.tsv"))
+
+data_sv |> slice_sample(n = 5)
+data_patient_sample |> slice_sample(n = 5)
+```
+
+## Data augmentation
+
+The clinical data contains 1.6k rows, where each entry represents a unique patient with a unique patient ID and a unique sample ID. In contrast, the Structural Variants (SV) data only has 346 rows, and the sample ID column is not a primary key: a single patient may have multiple entries, each representing a different SV.
+
+Therefore, we can augment our clinical data in two distinct ways: either by looking at the SVs separately (resulting in the sv_clinic_augm dataset), or by aggregating and adding the number of each SV class per patient (resulting in the clinical_with_sv dataset).
+
+```{r}
+
+sv_clinic_augm <- data_sv |> left_join(data_patient_sample, by = c("Sample_Id" = "SAMPLE_ID"))
+
+sv_per_patient <- data_sv |> 
+  group_by(Sample_Id) |> 
+  summarize(Total_SV = n(),                            
+    N_Deletions = sum(Class == "DELETION"),  
+    N_Duplications = sum(Class == "DUPLICATION"),
+    N_Inversions = sum(Class == "INVERSION"),
+    N_Translocations = sum(Class == "TRANSLOCATION")
+  )
+
+clinical_with_sv <- data_patient_sample |> 
+  left_join(sv_per_patient, by = c("SAMPLE_ID" = "Sample_Id")) |> 
+  mutate(Total_SV = replace_na(Total_SV, 0))
+
+```
+
+## Exploratory analysis
+
+### **Distribution** of structural variant class
+
+```{r}
+sv_clinic_augm |> ggplot(aes(x = Class, fill = Class))+
+  geom_bar(color = "black", alpha = 0.9) + 
+  theme_minimal()+
+  scale_fill_viridis(option = "viridis",
+                     discrete = TRUE)+
+  theme(panel.grid.major.x = element_blank()) + 
+  labs(x = "Structural variant class", y =" counts")
+  
+```
+
+### **Distribution of SVs length:**
+
+We omitted the translocation class here, as it lacks a determined size and was assigned a length of 0 in the dataset.
+
+```{r}
+ 
+SVs_length_distrib <- sv_clinic_augm |> filter(Class != "TRANSLOCATION") |> 
+  ggplot(aes(x=SV_Length, fill = Class)) +
+  geom_histogram(position = "identity", alpha = 0.8) +
+  scale_x_log10() +
+  scale_fill_viridis(option = "viridis",
+                     discrete = TRUE) +
+  theme_minimal() +
+  labs(
+    x = 'SV Length (Log10 scale)', 
+    y = 'Count', 
+    fill = 'SV Class', 
+    title = 'Distribution of Structural Variant lengths by Class', 
+    subtitle = 'Translocations excluded' 
+  )
+
+SVs_length_distrib
+
+```
+
+Even if deletion are over-represented, the few inversion are extremely long. We can also see the distribution of lengths within each class by using a density plot
+
+```{r}
+sv_clinic_augm |> filter(Class != "TRANSLOCATION") |> 
+  ggplot(aes(x = SV_Length, fill = Class, color = Class)) +
+  geom_density(alpha = 0.5) +  
+  scale_x_log10() +
+  scale_fill_viridis(option = "viridis",
+                     discrete = TRUE) +
+  scale_color_viridis(option = "viridis",
+                     discrete = TRUE) +
+  theme_minimal() +
+  labs(
+    x = 'SV Length (Log10 scale)', 
+    y = 'density', 
+    fill = 'SV Class', 
+    title = 'Density distribution of Structural Variant lengths by Class', 
+    subtitle = 'Translocations excluded' 
+  ) 
+```
+
+This clearly highlights the disparities in lenghts per class.
+
+### Class and number of SVs per cancer type
+
+```{r}
+
+SVs_per_cancer <- sv_clinic_augm |> 
+  group_by(CANCER_TYPE) |> 
+  ggplot(mapping = aes(x = CANCER_TYPE, fill = Class)) + 
+  geom_bar(color = "black", linewidth = 0.2, alpha = 0.9) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45,
+                                   hjust = 1,
+                                   size = 7)) +
+  scale_fill_viridis(option = "viridis",
+                     discrete = TRUE) +
+  theme(panel.grid.major.x = element_blank()) + 
+  labs(title = "Distribution of SV Class by Cancer Type",
+       x = "Cancer Type",
+       y = "SV Count")
+
+SVs_per_cancer
+
+```
+
+### Exploration of link between SVs, TMB and all cancer types
+
+While TMB captures nucleotide-level errors, SVs represent structural genomic instability. Here, we explore the absence or presence of a link between those 2 genomic modifications, considering each patient separately (clinical_with_sv).
+
+```{r}
+
+# clinical_with_sv |> 
+#   mutate(Has_SV = ifelse(Total_SV > 0, "With SV", "No SV")) |> 
+#   ggplot(aes(x = SAMPLE_TYPE, fill = Has_SV)) +
+#   geom_bar(position = "fill") + 
+#   theme_minimal() +
+#   labs(title = "Are Structural Variants enriched in Metastases?",
+#        y = "Proportion of Patients",
+#        x = NULL,
+#        fill = "SV Status")
+
+
+
+clinical_with_sv |> 
+  mutate(Has_SV = ifelse(Total_SV > 0, "With SV", "No SV")) |> 
+  ggplot(aes(x = SAMPLE_TYPE, fill = Has_SV)) +
+  geom_bar(position = "fill") + 
+  scale_y_continuous() +
+  coord_flip() +
+  facet_wrap(~CANCER_TYPE, ncol = 2) +
+  theme_minimal() +
+  labs(title = "Are Structural Variants enriched in Metastases?",
+       subtitle = "Comparison by Cancer Type",
+       y = "Proportion of Patients",
+       x = NULL,
+       fill = "SV Status")
+```
+
+```{r}
+
+clinical_with_sv |>  mutate(CANCER_TYPE = fct_reorder(CANCER_TYPE, TMB_NONSYNONYMOUS, .fun = median)) |> 
+  ggplot(aes(x = CANCER_TYPE, y = TMB_NONSYNONYMOUS)) +
+  geom_boxplot(fill = "orange", alpha = 0.6) +
+  scale_y_log10() +
+  coord_flip() + 
+  theme_minimal() +
+  labs(title = "Tumor Mutational Burden (TMB) across Cancer Types",
+       x = NULL, 
+       y = "TMB") +
+  theme_minimal()
+
+```
+
+There are no specific cancer types with an unusually high TMB. Maybe primary sites and metastases share different TMB?
+
+```{r}
+clinical_with_sv |> 
+  ggplot(aes(x = SAMPLE_TYPE, y = TMB_NONSYNONYMOUS, fill = SAMPLE_TYPE)) +
+  geom_boxplot(alpha = 0.8) +
+  scale_y_log10() +
+  facet_wrap(~CANCER_TYPE, scales = "free_y") +
+  theme_minimal() +
+  theme(legend.position = "none") + 
+  labs(title = "Comparison of TMB in Primary vs. Metastasis samples per cancer type",
+       subtitle = "",
+       x = NULL,
+       y = "TMB (log scale)")
+```
+
+```{r}
+
+clinical_with_sv |>  mutate(CANCER_TYPE = fct_reorder(CANCER_TYPE, Total_SV, .fun = mean)) |> 
+  ggplot(aes(x = CANCER_TYPE, y = Total_SV)) +
+  geom_jitter(alpha = 0.3, color = "darkblue") +
+  coord_flip() +
+  labs(title = "Structural Variants per Cancer Type", x = NULL, y = "SVs Counts") +
+  theme_minimal()
+
+
+```
+
+The recorded SVs are too sparse to represent a substantial part of any cancer type.
+
+Maybe we can try to see if some cancers are SV-focused, or TMB focused?
+
+```{r}
+clinical_with_sv |> 
+  ggplot(aes(x = TMB_NONSYNONYMOUS, y = Total_SV)) +
+  #geom_point(aes(color = CANCER_TYPE), alpha = 0.6) +
+  geom_jitter(aes(color = CANCER_TYPE), alpha = 0.6) +
+  geom_smooth(method = "lm", color = "black", se = FALSE) +
+  scale_x_log10() + 
+  theme_minimal() +
+  labs(title = "Correlation: TMB vs. SV",
+       x = "TMB",
+       y = "Number of SVs")
+```
+
+The lack of sequenced data for the SVs presents a severe limitation for this analysis.
+
+## Exporting plots
+
+```{r}
+if(!dir.exists(here("results"))) dir.create(here("results"))
+if(!dir.exists(here("results",'figures'))) dir.create(here("results", 'figures'))
+
+ggsave(here('results','figures', 'SV_count_per_cancer.png'), SVs_per_cancer)
+ggsave(here('results','figures', 'SV_lengths_distribution.png'), SVs_length_distrib)
+```
