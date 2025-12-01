@@ -24,7 +24,6 @@ format:
 -   MSK-IMPACT -\> Next Generation Sequencing
 -   3 versions: IMPACT 3 (341 genes), IMPACT 5 (410 genes), IMPACT 6 (468 genes)
 -   Higher count of mutations detected as more genes are analysed
-
 -   Datasets:
     -   data_clinical_patient.txt
     -   data_clinical_sample.txt
