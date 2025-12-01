@@ -54,7 +54,7 @@ format:
 
 -   Survival analysis - stratified by Cancer type ![](../results/figures/surv_count_per_gender_per_cancer.png){.absolute top="170" left="30" width="400" height="400"} ![](../results/figures/survival_cancer_type.png){.absolute top="170" left="30" width="400" height="400"}
 
--   Number of Mutations & SV per Cancer Type ![](../results/figures/SV_count_per_cancer.png){.absolute bottom="20" left="30" width="400" height="400"}
+-   Number of SV per Cancer Type ![](../results/figures/SV_count_per_cancer.png){.absolute bottom="20" left="30" width="400" height="400"}
 
 -   Mutation Type per Cancer Type
 ![](../results/figures/mutation_by_cancer.png){.absolute bottom="20" left="30" width="400" height="400"}
@@ -79,7 +79,9 @@ format:
 
 -   EGFR per Cancer Type -\> Glioma ![](../results/figures/EGFR_count_per_cancer.png)
 
--   Overview Glioma
+-   SV counts for glioma ![](../results/figures/SV_gene_in_glioma.png)
+
+- Mutation counts for glioma ![](../results/figures/Mutation_count_in_glioma.png)
 
 ## Results 4
 
