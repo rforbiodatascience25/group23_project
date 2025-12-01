@@ -17,6 +17,8 @@ library(viridis)
 
 ## Data wrangling:
 
+Load the Gene Panel Matrix dataset and select the *SAMPLE_ID* and *IMPACT_version* columns.
+
 ```{r}
 #Load the gene panel matrix data
 gene_panel_matrix <- read_delim(here("data",
@@ -28,6 +30,8 @@ gene_panel_matrix <- gene_panel_matrix |>
          IMPACT_version)
 gene_panel_matrix
 ```
+
+Load the Mutations dataset.
 
 ```{r}
 #Load the mutations data
@@ -45,24 +49,30 @@ data_mutation <- data_mutation |>
            .keep_all = TRUE)
 ```
 
+Rename some columns to keep the same format.
+
 ```{r}
 #Rename the ID column and the gene column
 data_mutation <- data_mutation |> 
   rename(SAMPLE_ID = Tumor_Sample_Barcode,
-         gene = Hugo_Symbol)
+         GENE = Hugo_Symbol)
 ```
+
+Select the relevant columns from the data_mutation dataset and merge both datasets by SAMPLE_ID.
 
 ```{r}
 #Select the columns of interest
 data_mutation <- data_mutation |> 
   select(SAMPLE_ID,
-         gene,
+         GENE,
          Variant_Classification)
 #Merge both objects in a new one
 combined_data <- left_join(gene_panel_matrix,
                            data_mutation,
                            by = "SAMPLE_ID")
 ```
+
+Organize the data by grouping it by **SAMPLE_ID**, ensuring that each row corresponds to a single sample with a tibble listing the mutated genes. Then, calculate the number of mutations per patient.
 
 ```{r}
 #Group the data by the Sample ID and count the number of mutations per patient
@@ -72,10 +82,14 @@ combined_data <- combined_data |>
     IMPACT_version = first(IMPACT_version),
     n_mutation = n(),
     mutations = list(select(cur_data(),
-                            gene,
+                            GENE,
                             Variant_Classification))        
   )
+
+combined_data
 ```
+
+Calculate the percentage of each mutation for each IMPACT version. Group the less represented mutations into broader categories to improve the final plots clarity.
 
 ```{r}
 #Create a new object with the percentages of each type of mutation per
@@ -162,6 +176,7 @@ ggplot(data = percentage_type,
                      fill = Variant_Classification)) +
   geom_col(alpha = 0.8) + 
   theme_minimal() + 
+  theme(panel.grid.major.x = element_blank()) +
   scale_fill_viridis(option = "viridis",
                      discrete = TRUE) +
   labs(title = "Distribution of mutation type by IMPACT version",
