@@ -95,39 +95,51 @@ Detailed information for each column with examples can be found in the descripti
 
 project/
 
-\|── raw/
+**raw/tmb_msckcc_2018**
 
-\|──tmb_mskcc_2018/
+Contains all the imported raw files:
 
-│── data_clinical_patients.txt\
-│── data_clinical_sample.txt\
-│── data_gene_panel_matrix.txt\
-│── data_mutation.txt\
-│── data_sv.txt\
-\|── data/
+data_clinical_patients.txt\
+data_clinical_sample.txt\
+data_gene_panel_matrix.txt\
+data_mutation.txt\
+data_sv.txt\
 
-│── data_mutation_cleaned.tsv\
-│── patient_sample_gen_panel.tsv\
-│── sv_cleaned.tsv\
-\|──R/ #Quarto script for loading, cleaning, analysis...
+**data/**
 
-│── 00_all.qmd\
-│── ...\
-\|── results/ #Rendered scripts in html
+Contains the saved cleaned and merged files:
 
-│── 00_all.html\
-│── ...\
-│── figures/ #Figures saved for the presentation
+data_mutation_cleaned.tsv\
+patient_sample_gen_panel.tsv\
+sv_cleaned.tsv\
 
-│── EGFR_count_per_cancer.png\
-│── ...\
-\|──doc/
+**R/**
 
-│── presentation_group23.qmd\
-│── presentation_group23.html\
-│── styles.css
+Contains the Quarto script for loading, cleaning, analysis...
 
-\|── .gitignore
+ex: 00_all.qmd\
+\
+**results/**
+
+Contains the Rendered scripts in html
+
+ex: 00_all.html\
+\
+**results/figures/**
+
+Contains the figures saved for the presentation
+
+ex: EGFR_count_per_cancer.png\
+\
+**doc/**
+
+The folder with the presenattion slides
+
+presentation_group23.qmd\
+presentation_group23.html\
+styles.css
+
+.gitignore
 
 └── README.md
 
@@ -139,8 +151,8 @@ order of run:
 2.  02_clean_qmd : To clean the .txt files
 3.  03_augment.qmd : merging some files and saving the files in data
 4.  individual analysis:
-    1.  04_01_data_clincal_patient_analysis.qmd : description and investigation on the Clinical Patients file
-    2.  04_02_data_clincal_sample_analysis.qmd : description and investigation on the Clinical Sample file
+    1.  04_01_data_clinical_patient_analysis.qmd : description and investigation on the Clinical Patients file
+    2.  04_02_data_clinical_sample_analysis.qmd : description and investigation on the Clinical Sample file
     3.  04_03_data_mutations_analysis.qmd : description and investigation on the Mutations file
     4.  04_04_gene_panel_mutation.qmd : description and investigation on the gene panel mutation file
     5.  04_05_sv_class_analysis.qmd : description and investigation on the Structural variants file
