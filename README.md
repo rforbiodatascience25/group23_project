@@ -1,5 +1,23 @@
 # group23_project
 
+## Project Contributors:
+
+-   s250823 : benklerc
+
+-   s253698: FrancescCalabuig
+
+-   s253730: MaxenceMarbouty
+
+-   s253729: L0uisP
+
+-   s243419: roms02
+
+## Data
+
+Data was obtained from: <https://www.cbioportal.org/study/clinicalData?id=tmb_mskcc_2018>
+
+Loading data script in raw folder directly loads each .txt files:
+
 ## Description of .txt files
 
 ### data_clinical_patient.txt
@@ -59,6 +77,10 @@ This file describes different gene mutations and indicator for more than 20000 s
 ### data_sv.txt
 
 This file describes 347 structural variants (SV) detected in tumor sample, with 30 columns. Most of the columns provide genome-focused details that might not be relevant to our analysis. But if we need to look more closely at specific variants, this file gives access to sequencing information such as type of SV, region of breakpoint and more.
+
+## Link to presentation
+
+xxx
 
 ## Quick summary:
 
