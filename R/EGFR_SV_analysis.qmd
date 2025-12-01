@@ -39,10 +39,6 @@ As already stated in the SV class analysis, clinical and SV data have different 
 
 sv_clinic_augm <- data_sv |> left_join(data_patient_sample, by = c("Sample_Id" = "SAMPLE_ID"))
 
-clinical_with_sv <- data_patient_sample |> 
-  left_join(sv_per_patient, by = c("SAMPLE_ID" = "Sample_Id")) |> 
-  mutate(Total_SV = replace_na(Total_SV, 0))
-
 mutations_augm_pat <- data_mutations |> 
   left_join(data_patient_sample, by = c("Tumor_Sample_Barcode" = "SAMPLE_ID"))
 
