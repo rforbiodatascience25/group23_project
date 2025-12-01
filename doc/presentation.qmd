@@ -216,6 +216,10 @@ format:
 
 ## Discussion
 
+::: columns
+
+::: {.column width="50%"}
+
 -   **Tumor Burden Hypothesis:**
     -   General trend: Higher TMB $\rightarrow$ higher survival.
     
@@ -225,3 +229,12 @@ format:
 -   **The Glioma Exception:**
     -   Glioma appears to be an exemption to the TMB rule.
     -   No clear correlation observed in our subset analysis.
+
+:::
+
+::: {.column width="50%"}
+
+![](../results/figures/TMB_all_vs_glioma.png)
+:::
+
+:::
