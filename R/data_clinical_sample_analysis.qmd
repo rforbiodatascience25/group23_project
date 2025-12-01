@@ -67,7 +67,8 @@ Age distribution:
 
 ```{r}
 ggplot(clinical_sample, aes(AGE_AT_SEQ_REPORT))+
-  geom_bar()
+  geom_bar()+
+  labs(title ='Age distribution')
 ```
 
 Investigate the warning: One Sample without recorded Age and TMB
@@ -82,7 +83,8 @@ Many samples with low TMB
 
 ```{r}
 ggplot(clinical_sample, aes(TMB_NONSYNONYMOUS))+
-  geom_density()
+  geom_density()+
+  labs(title = 'TMB Distribution')
 ```
 
 Investigate high samples with high TMB

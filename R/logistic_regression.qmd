@@ -17,7 +17,7 @@ library(tidyverse)
 
 ```{r}
 patient_sample <- read_tsv(file = here('data','patient_sample_gene_panel.tsv'))
-sv <- read_tsv(file = here('data','sv.tsv'))
+sv <- read_tsv(file = here('data','sv_cleaned.tsv'))
 mutations <- read_tsv(file = here('data','data_mutation_cleaned.tsv'))
 ```
 
