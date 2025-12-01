@@ -86,30 +86,47 @@ format:
 
 ## Results: Structural Variants (SV)
 
+**Structural Variants (SVs) are large-scale genomic rearrangements that can significantly disrupt gene function.**
+
 ::: columns
 ::: {.column width="50%"}
-### SV Length Distribution
+
 ![](../results/figures/SV_lengths_distribution.png)
 :::
 
 ::: {.column width="50%"}
-### SV Count per Gene
+
 ![](../results/figures/SV_count_per_gene.png)
 :::
 :::
 
-## Results: Glioma Focus
+**EGFR is the most significantly overrepresented gene when aggregating both the beginning and ending sites of the SVs.**
+
+## Results: EGFR Focus in Glioma
+
+**EGFR is a receptor tyrosine kinase frequently altered in cancer. Its activation drives uncontrolled cell growth and proliferation.**
+
 
 ::: columns
-::: {.column width="60%"}
--   **EGFR Mutations:** Glioma shows distinct patterns compared to other cancer types.
--   **Overview:** High prevalence of specific structural variants in Glioma samples.
+  
+::: {.column width="34%"}
+
+
+![](../results/figures/EGFR_count_per_cancer.png){width=100%}
 :::
 
-::: {.column width="40%"}
-![EGFR Count per Cancer Type](../results/figures/EGFR_count_per_cancer.png)
+::: {.column width="34%"}
+
+![](../results/figures/SV_gene_in_glioma.png){width=100%}
 :::
+
+::: {.column width="32%"}
+
+![](../results/figures/Mutation_count_in_glioma.png){width=100%}
 :::
+
+:::
+
 
 ## Results: Confounders in Glioma
 
