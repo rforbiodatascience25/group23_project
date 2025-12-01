@@ -21,9 +21,8 @@ format:
     -   *Concept:* Higher TMB $\rightarrow$ Higher response?
 
 ![](../results/figures/Figure_paper.png){width=60%}
-:::
-:::
 
+From
 ## Materials
 
 ::: columns
