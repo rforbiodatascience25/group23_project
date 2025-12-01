@@ -174,6 +174,10 @@ format:
 
 **Significant Pathways in Glioma**
 
+::: columns
+
+::: {.column width="60%"}
+
 ::: table-small
 | Biological Process | pvalue | adjusted pvalue |
 |:---|---:|---:|
@@ -193,6 +197,20 @@ format:
 | GOBP_CELL_AGING | 3.01e-05 | 0.00106 |
 | [GOBP_EXTRINSIC_APOPTOTIC_SIGNALING_PATHWAY]{style="color: green;"} | 3.40e-05 | 0.00112 |
 :::
+
+:::
+
+::: {.column width="40%"}
+
+- Genes with mutations: 270
+  -> 123 significant pathways
+- Genes with strucural variance: 28
+  -> 0 significant pathways
+
+:::
+
+:::
+
 
 ## Results: Confounders in Glioma
 
