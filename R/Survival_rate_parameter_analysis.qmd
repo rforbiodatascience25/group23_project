@@ -1,6 +1,8 @@
 ---
 title: "Survival Rate - Multi parameter analysis"
-format: html
+format: 
+  html:
+    self-contained: true
 editor: visual
 ---
 
