@@ -78,9 +78,9 @@ format:
 
 ## Results 3
 
--   EGFR per Cancer Type -\> Glioma ![](../results/figures/EGFR_count_per_cancer.png.png)
+-   EGFR per Cancer Type -\> Glioma ![](../results/figures/EGFR_count_per_cancer.png)
 
--   Overview Glioma 
+-   Overview Glioma
 
 ## Results 4
 
