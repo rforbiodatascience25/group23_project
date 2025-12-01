@@ -147,19 +147,19 @@ styles.css
 
 order of run:
 
-1.  01_load.qmd : To load the data into raw
-2.  02_clean_qmd : To clean the .txt files
-3.  03_augment.qmd : merging some files and saving the files in data
+1.  01_load : To load the data into raw
+2.  02_clean : To clean the .txt files
+3.  03_augment : merging some files and saving the files in data
 4.  individual analysis:
-    1.  04_01_data_clinical_patient_analysis.qmd : description and investigation on the Clinical Patients file
-    2.  04_02_data_clinical_sample_analysis.qmd : description and investigation on the Clinical Sample file
-    3.  04_03_data_mutations_analysis.qmd : description and investigation on the Mutations file
-    4.  04_04_gene_panel_mutation.qmd : description and investigation on the gene panel mutation file
-    5.  04_05_sv_class_analysis.qmd : description and investigation on the Structural variants file
-5.  05_Survival_rate_parameter_analysis.qmd : analysis on merged between clinical patients and sample files
-6.  06_mutation_types.qmd : analysis on merged between sample and mutation files
-7.  07_EFGR_SV_analysis.qmd : analysis specified of the EGFR gene (Glioma cancer)
-8.  08_Cox_Regression.qmd
-9.  09_gene_enrichment_analysis.qmd
+    1.  04_01_data_clinical_patient_analysis : description and investigation on the Clinical Patients file
+    2.  04_02_data_clinical_sample_analysis : description and investigation on the Clinical Sample file
+    3.  04_03_data_mutations_analysis : description and investigation on the Mutations file
+    4.  04_04_gene_panel_mutation : description and investigation on the gene panel mutation file
+    5.  04_05_sv_class_analysis : description and investigation on the Structural variants file
+5.  05_Survival_rate_parameter_analysis : analysis on merged between clinical patients and sample files
+6.  06_mutation_types : analysis on merged between sample and mutation files
+7.  07_EFGR_SV_analysis : analysis specified of the EGFR gene (Glioma cancer)
+8.  08_Cox_Regression : cox regression analysis from patients, sample and mutation file
+9.  09_gene_enrichment_analysis : analysis of gene pathways affected by TMB
 
 00_all.qmd can run all the files
