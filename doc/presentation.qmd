@@ -15,16 +15,12 @@ format:
 
 ## Introduction/Background
 
-::: columns
-::: {.column width="60%"}
 -   **Study Cohort:** 1661 patients/samples.
 -   **Objective:** Identify predictive biomarkers for Immune Checkpoint Inhibitors (ICI).
 -   **Hypothesis:** Does Tumor Mutational Burden (TMB) correlate with survival?
     -   *Concept:* Higher TMB $\rightarrow$ Higher response?
-:::
 
-::: {.column width="40%"}
-<!-- You can add a schematic image here if you have one, or leave blank -->
+![](../results/figures/Figure_paper.png){width=60%}
 :::
 :::
 
