@@ -89,7 +89,7 @@ Main information from the file, description:
 -   Event_Info, Annotation, Comments give biological context.
 -   Read counts help assess detection quality and confidence.
 
-Detailed information for each column with examples can be found in the description_data_sv textfile.
+
 
 # Structure
 
