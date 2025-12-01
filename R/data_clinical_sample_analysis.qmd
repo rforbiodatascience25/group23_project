@@ -3,8 +3,6 @@ title: "data_clinical_sample_analysis"
 format: 
   html:
     self-contained: true
-output-file: data_clinical_sample_analysis.html
-output-dir: results
 ---
 
 # Load Packages
