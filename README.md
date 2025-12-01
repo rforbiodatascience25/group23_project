@@ -104,7 +104,7 @@ data_clinical_sample.txt\
 data_gene_panel_matrix.txt\
 data_mutation.txt\
 data_sv.txt\
-
+\
 **data/**
 
 Contains the saved cleaned and merged files:
@@ -112,7 +112,7 @@ Contains the saved cleaned and merged files:
 data_mutation_cleaned.tsv\
 patient_sample_gen_panel.tsv\
 sv_cleaned.tsv\
-
+\
 **R/**
 
 Contains the Quarto script for loading, cleaning, analysis...
