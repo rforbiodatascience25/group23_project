@@ -45,7 +45,7 @@ These scripts perform more particular Analysis to follow findings from the explo
 quarto::quarto_render(here("R", "Cox_Regression.qmd"))
 quarto::quarto_render(here("R", "gene_enrichment_analysis.qmd"))
 quarto::quarto_render(here("R", "mutation_types.qmd"))
-quarto::quarto_render(here("R", "Survival_rate_parameters"))
+quarto::quarto_render(here("R", "Survival_rate_parameter_analysis.qmd"))
 ```
 
 # Move HTML files to Results
