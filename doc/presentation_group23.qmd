@@ -15,33 +15,17 @@ format:
 ## Introduction/Background
 
 -   Study with 1661 patients/samples
-
 -   Main objective: New predictive biomarkers for Immune Checkpoint Inhibitors (ICI)
-
--   
-
-    ```         
-    Examine the impact of Tumor Mutational Burden (TMB)
-    ```
-
--   
-
-    ```         
-    Higher TMB = Higher response?
-    ```
+-   Examine the impact of Tumor Mutational Burden (TMB)
+-   Higher TMB = Higher response?
 
 ## Materials
 
 -   MSK-IMPACT -\> Next Generation Sequencing
-
 -   3 versions: IMPACT 3 (341 genes), IMPACT 5 (410 genes), IMPACT 6 (468 genes)
+-   Higher count of mutations detected as more genes are analysed
 
--   
-
-    ```         
-    Higher count of mutations detected as more genes are analysed
-    ```
-
+-   Datasets:
     -   data_clinical_patient.txt
     -   data_clinical_sample.txt
     -   data_gene_panel_matrix.txt
