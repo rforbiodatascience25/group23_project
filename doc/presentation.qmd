@@ -80,16 +80,21 @@ format:
 
 :::
 
-## Results: Overview
-
-**Survival Analysis & Mutation Types**
+## Results: Overview - Survival Analysis & Mutation Types
 
 ::: {layout-ncol=3}
-![Survival by Gender](../results/figures/surv_count_per_gender_per_cancer.png)
+![](../results/figures/surv_count_per_gender_per_cancer.png)
 
-![Survival by Cancer Type](../results/figures/survival_cancer_type.png)
+![](../results/figures/survival_cancer_type.png)
 
-![SV Count per Cancer](../results/figures/SV_count_per_cancer.png)
+::: {width="90%"}
+
+![](../results/figures/SV_count_per_cancer.png)
+
+
+![](../results/figures/mutation_by_cancer.png)
+:::
+
 :::
 
 ## Results: Structural Variants (SV)
