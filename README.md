@@ -1,4 +1,4 @@
-# group23_project
+# group_23_project
 
 ## Project Contributors:
 
@@ -12,11 +12,15 @@
 
 -   s243419: roms02
 
+## Link to presentation
+
+<https://raw.githack.com/rforbiodatascience25/group_23_project/main/doc/presentation.html>
+
 ## Data
 
-Data was obtained from: <https://www.cbioportal.org/study/clinicalData?id=tmb_mskcc_2018>
+Data was obtained from cBioPortal: <https://www.cbioportal.org/study/clinicalData?id=tmb_mskcc_2018>
 
-Loading data script in raw folder directly loads each .txt files:
+5 files can be found on cBioPortal
 
 ## Description of .txt files
 
@@ -78,11 +82,7 @@ This file describes different gene mutations and indicator for more than 20000 s
 
 This file describes 347 structural variants (SV) detected in tumor sample, with 30 columns. Most of the columns provide genome-focused details that might not be relevant to our analysis. But if we need to look more closely at specific variants, this file gives access to sequencing information such as type of SV, region of breakpoint and more.
 
-## Link to presentation
-
-xxx
-
-## Quick summary:
+Main information from the file, description:
 
 -   Site1 / Site2 columns describe the two breakpoints of a Structural Variant (gene, region, position).
 -   Class, Breakpoint_Type, Connection_Type describe the type of SV.
@@ -91,53 +91,75 @@ xxx
 
 Detailed information for each column with examples can be found in the description_data_sv textfile.
 
-## TODOs:
+# Structure
 
--   Survival Rate (with different parameters, ex tumor types, drug types, tmb, kind of mutation)(Romane)
--   Logistic regression(correlation of survival rate with all the different information)(Cora)
--   Correlation Matrix(Cora)
--   Partial Correlation(survival rates to all the paramters)(Louis)
--   Number of metastasis compared to tumor type(Cora)
--   corellation of TMB to metastasis, mutation(), cancer type(Francesc, Maxence)
--   comparison number of mutations and IMPACT version(Francesc)
--   Kind of mutation to TMB, Metastasis(Maxence)
--   Kind of Mutations numbers(Maxence)
+project/
 
-# New TODOs:
+**raw/tmb_msckcc_2018**
 
--   Add cleaning into Importing_raw_data script(louis), add merging and then load into data folder
+Contains all the imported raw files:
 
-    -   load merged data Sample+Patient+ Impact, SV , Mutation
+data_clinical_patients.txt\
+data_clinical_sample.txt\
+data_gene_panel_matrix.txt\
+data_mutation.txt\
+data_sv.txt\
+\
+**data/**
 
-    -   changing analysis scripts to load data in scripts
+Contains the saved cleaned and merged files:
 
--   bar plot: numbers of mutation, but stacked with kind of mutation(Louis data set)
+data_mutation_cleaned.tsv\
+patient_sample_gen_panel.tsv\
+sv_cleaned.tsv\
+\
+**R/**
 
--   data description in read-me+ clean up
+Contains the Quarto script for loading, cleaning, analysis...
 
--   mutation analysis of glioma samples(Maxence)
+ex: 00_all.qmd\
+\
+**results/**
 
--   do analysis on subset of cancer type = glioma(Cora, Louis, maybe Romane)
+Contains the Rendered scripts in html
 
--   structure github
+ex: 00_all.html\
+\
+**results/figures/**
 
-    -   do requirements of course
+Contains the figures saved for the presentation
 
-    -   add contributions in readme
+ex: EGFR_count_per_cancer.png\
+\
+**doc/**
 
-Potential analysis:
+The folder with the presenattion slides
 
--   Gene level enrichment(are certain genes more often mutated than others)
+presentation.qmd\
+presentation.html\
+styles.css
 
--   Map genes to functional pathways
+.gitignore
 
--   correlation tmb vs mutation of specific genes
+└── README.md
 
-# Presentation:
+# Instructions to Run
 
-1.  Introduction to our data(give background)(cancer data, study, data formats in the 5 files)
-2.  Material(Francesc) with Impact
-3.  Overview over data, general plots
-4.  Patient information(age distribution, sex, number of patients, etc)(barplot age &sex stacked)+ survival rate
-5.  SV+most mutated gene+most present in Glioma
-6.  Network based on glioma
+order of run:
+
+1.  01_load.qmd : To load the data into raw
+2.  02_clean_qmd : To clean the .txt files
+3.  03_augment.qmd : merging some files and saving the files in data
+4.  individual analysis:
+    1.  04_01_data_clinical_patient_analysis.qmd : description and investigation on the Clinical Patients file
+    2.  04_02_data_clinical_sample_analysis.qmd : description and investigation on the Clinical Sample file
+    3.  04_03_data_mutations_analysis.qmd : description and investigation on the Mutations file
+    4.  04_04_gene_panel_mutation.qmd : description and investigation on the gene panel mutation file
+    5.  04_05_sv_class_analysis.qmd : description and investigation on the Structural variants file
+5.  05_Survival_rate_parameter_analysis.qmd : analysis on merged between clinical patients and sample files
+6.  06_mutation_types.qmd : analysis on merged between sample and mutation files
+7.  07_EFGR_SV_analysis.qmd : analysis specified of the EGFR gene (Glioma cancer)
+8.  08_Cox_Regression.qmd
+9.  09_gene_enrichment_analysis.qmd
+
+00_all.qmd can run all the files
