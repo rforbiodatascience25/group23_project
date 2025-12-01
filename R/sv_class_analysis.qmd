@@ -22,9 +22,9 @@ library(viridis)
 ## Import data
 
 ```{r}
-data_sv <- read_tsv(here("data", "sv_cleaned"))
+data_sv <- read_tsv(here("data", "sv_cleaned.tsv"))
 
-data_patient_sample <- read.delim(here("data", "patient_sample_gene_panel"))
+data_patient_sample <- read_tsv(here("data", "patient_sample_gene_panel.tsv"))
 
 data_sv |> slice_sample(n = 5)
 data_patient_sample |> slice_sample(n = 5)
